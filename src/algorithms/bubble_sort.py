@@ -1,6 +1,10 @@
-def bubble_sort(arr: list) -> None:
-    n = len(arr)
-    for i in range(n):
-        for j in range(n-i-1):
-            if arr[j] > arr[j+1]:
-                arr[j], arr[j+1] = arr[j+1], arr[j]
+from algorithm import Algorithm
+
+class BubbleSort(Algorithm):
+    def algorithm(self):
+        n = len(self.array)
+        for i in range(n):
+            for j in range(n-i-1):
+                if self.array[j] > self.array[j+1]:
+                    self.array[j], self.array[j+1] = self.array[j+1], self.array[j]
+            self.update_view(self.array[j], self.array[j+1])    
