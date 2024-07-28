@@ -1,21 +1,10 @@
 from abc import abstractmethod
-from random import sample
-import time
+from rectangle import Rectangle
 
 class Algorithm:
-    def __init__(self):
-        self.array = sample(range(512), 512)
-        
-    
-    def run(self):
-        self.start_time = time.time()
-        self.algorithm()
-        time_end = time.time() - self.start_time
-        return self.array, time_end
-    
-    def update_view(self, a, b):
-        pass
+    def __init__(self, draw):
+        self.draw = draw
     
     @abstractmethod
-    def algorithm(self):
+    def algorithm(self, rects: list[Rectangle]):
         raise TypeError(f"method algorithm has not been overwritten.")
