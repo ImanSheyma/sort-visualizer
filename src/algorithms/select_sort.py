@@ -7,7 +7,7 @@ class SelectSort(Algorithm):
     
         for i in range(num_rects):
             min_index = i
-            rects[i].set_smallest()
+            rects[i].curr()
             
             for j in range(i+1, num_rects):
                 rects[j].select()
@@ -17,7 +17,7 @@ class SelectSort(Algorithm):
                     rects[min_index].unselect()
                     min_index = j
                     
-                rects[min_index].set_smallest()
+                rects[min_index].curr()
                 self.draw(rects)
                 rects[j].unselect()
                 

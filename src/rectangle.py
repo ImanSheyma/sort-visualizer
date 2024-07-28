@@ -21,7 +21,7 @@ class Rectangle:
         self.color = PURPLE
         
     
-    def set_smallest(self):
+    def curr(self):
         self.color = LIGHT_BLUE
         
     
