@@ -1,4 +1,5 @@
 import pygame
+from pygame_menu import Menu, themes, events
 import random
 from algorithms import *
 from rectangle import Rectangle
@@ -10,16 +11,43 @@ WINDOW_SIZE = 600
 WINDOW = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
 pygame.display.set_caption("Sort Visualizer")
 
+
 #variables
 RECT_WIDTH = 20
 clock = pygame.time.Clock()
-FPS = 10
+FPS = 30
+sorter = BubbleSort
+rects = []
+#defines sorting algorithm and dataset status
+initialized = False
+
 
 #colors
 BLACK = (0, 0, 0)
 GREY = (170, 170, 170)
-        
 
+
+#MENU
+#handlers
+def set_sorting_generator(selected, index): 
+    globals()['initialized'] = False
+    globals()['sorter'] = selected[0][1]
+    
+    
+
+def handle_start(menu):
+    menu.disable()
+    menu.full_reset()
+
+#menu items
+menu = Menu('MENU', WINDOW_SIZE, WINDOW_SIZE, theme=themes.THEME_DARK)
+menu.add.dropselect('Algorithm', algoritms_list, 0, onchange=set_sorting_generator)
+menu.add.button('Start', handle_start, menu)
+menu.add.button('Exit', events.EXIT)
+menu.enable()
+
+
+#dataset creater
 def create_rects() -> list[Rectangle]:
     num_rects = WINDOW_SIZE // RECT_WIDTH - 5
     rects = []
@@ -28,11 +56,11 @@ def create_rects() -> list[Rectangle]:
     for i in range(5, num_rects):
         height = random.randint(20, 500)
         heights.append(height)
-        rects.append(Rectangle(i*RECT_WIDTH, RECT_WIDTH, height))
-        
+        rects.append(Rectangle(i*RECT_WIDTH, RECT_WIDTH, height))       
     return rects
 
 
+#visuals
 def draw_rects(rects: list[Rectangle]):
     WINDOW.fill(GREY)
     
@@ -53,38 +81,50 @@ def display_text(txt, y, size):
 
 
 def main():
-    rects = create_rects()
-    draw_rects(rects)
-    sorting_generator = SelectSort(draw_rects).algorithm(rects)
-    
     run = True
     sorting = False
+    global initialized
+     
     while run:
-        clock.tick(FPS)
+        events = pygame.event.get()
         
-        if sorting:
-            try:
-                next(sorting_generator)
-            except StopIteration:
-                sorting = False        
+        if menu.is_enabled():
+            menu.draw(WINDOW)
+            menu.update(events)
+            
         else:
-            draw_rects(rects)
-        
-        display_text('Press SPACE to start sorting or pause or q to quite', 70, 30)
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
+            if not initialized:
+                rects = create_rects()
+                draw_rects(rects)
+                sorting_generator = sorter(draw_rects).algorithm(rects)
+                initialized = True
                 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    sorting = not sorting
-                    
-                if event.key == pygame.K_q:
+            if sorting:
+                clock.tick(FPS)
+                try:
+                    next(sorting_generator)
+                except StopIteration:
+                    sorting = False        
+            else:
+                draw_rects(rects)
+                display_text('Press SPACE to start or pause, m to open menu', 70, 30)
+
+            for event in events:
+                if event.type == pygame.QUIT:
                     run = False
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        sorting = not sorting
+                        
+                    if event.key == pygame.K_m:
+                        menu.enable()
+
+                    if event.key == pygame.K_q:
+                        run = False
+            
                 
         pygame.display.update()
-        
     pygame.quit()
     
 main()
